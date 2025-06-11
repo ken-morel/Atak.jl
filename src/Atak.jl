@@ -1,5 +1,10 @@
 module Atak
+using Efus
+using Efus: EObservable
+export getcurrentpage
 
-# Write your package code here.
+include("application.jl")
+include("router.jl")
+
 
 end

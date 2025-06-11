@@ -3,11 +3,14 @@ uuid = "ea1fb407-d168-472b-9d3b-6f44c48cad5b"
 authors = ["ken-morel <engonken8@gmail.com> and contributors"]
 version = "0.1.0"
 
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+[deps]
+Efus = "9109e250-8bcb-41d8-9faa-e136e3e06a79"
 
 [compat]
 julia = "1.11"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test"]
