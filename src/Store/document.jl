@@ -21,13 +21,13 @@ function set!(doc::Document{T}, value::Union{T,Nothing})::Union{T,Nothing} where
   end
 end
 
-function update!(fn::Function, doc::Document{T})::{T, Nothing} where T
+function update!(fn::Function, doc::Document{T})::Union{T, Nothing} where T
   set!(doc, doc |> get |> fn)
 end
 
 function edit!(
   fn!::Function, doc::Document{T}, default::Union{T,Nothing}=nothing
-)::{T, Nothing} where T
+)::Union{T, Nothing} where T
   data = doc |> get
   if isnothing(data)
     data = default
@@ -35,4 +35,10 @@ function edit!(
   fn!(data)
   set!(doc, data)
 end
+
+
+function document(namespace::Namespace, name::Symbol, ::Type{T}=Any) where T
+  Document{T}(joinpath(namespace.foldername, string(name) * ".jld2"))
+end
+
 
