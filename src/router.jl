@@ -16,22 +16,22 @@ end
 function Base.push!(
   r::Router{T}, page::T;
   replace::Bool=false, clear::Bool=false,
+  notify::Bool=true
 )::T where T
   clear && empty!(r)
   replace && length(r.pagestack) > 0 && pop!(r)
   push!(r.pagestack, page)
-  println("pagestacked push")
-  errormonitor(@async Efus.notify(r))
+  notify && errormonitor(@async Efus.notify(r))
   page
 end
 
-function Base.pop!(r::Router{T})::Union{T,Nothing} where T
+function Base.pop!(r::Router{T}; notify::Bool=true)::Union{T,Nothing} where T
   length(r.pagestack) == 0 && return nothing
   poped = pop!(r.pagestack)
-  errormonitor(@async Efus.notify(r))
+  notify && errormonitor(@async Efus.notify(r))
   poped
 end
-empty!(r::Router) = empty!(r.pagestack)
+Base.empty!(r::Router) = empty!(r.pagestack)
 
 function getcurrentpage(r::Router{T})::T where T
   current = if isempty(r.pagestack)

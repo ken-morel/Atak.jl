@@ -2,7 +2,7 @@ struct Document{T} <: AbstractStoreNode
   filename::String
 end
 
-function get(doc::Document{T})::Union{T,Nothing} where T
+function Base.get(doc::Document{T})::Union{T,Nothing} where T
   !ispath(doc.filename) && return nothing
   try
     jldopen(doc.filename, "r") do file
@@ -21,19 +21,20 @@ function set!(doc::Document{T}, value::Union{T,Nothing})::Union{T,Nothing} where
   end
 end
 
-function update!(fn::Function, doc::Document{T})::Union{T, Nothing} where T
+function update!(fn::Function, doc::Document{T})::Union{T,Nothing} where T
   set!(doc, doc |> get |> fn)
 end
 
 function edit!(
   fn!::Function, doc::Document{T}, default::Union{T,Nothing}=nothing
-)::Union{T, Nothing} where T
+)::Union{T,Nothing} where T
   data = doc |> get
   if isnothing(data)
     data = default
   end
-  fn!(data)
+  ret = fn!(data)
   set!(doc, data)
+  ret
 end
 
 
