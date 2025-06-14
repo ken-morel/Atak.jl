@@ -25,7 +25,7 @@ function update!(fn::Function, doc::Document{T})::Union{T,Nothing} where T
   set!(doc, doc |> get |> fn)
 end
 
-function edit!(
+function alter!(
   fn!::Function, doc::Document{T}, default::Union{T,Nothing}=nothing
 )::Union{T,Nothing} where T
   data = doc |> get

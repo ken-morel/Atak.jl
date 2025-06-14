@@ -5,7 +5,7 @@ using Dates
 
 export datastore, namespace, document, collection
 export DataStore, Namespace, Document, Collection
-export update!, edit!, set!
+export update!, alter!, set!
 
 abstract type AbstractStoreNode end
 abstract type AbstractStoreContainer <: AbstractStoreNode end
