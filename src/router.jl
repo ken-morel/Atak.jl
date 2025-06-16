@@ -35,6 +35,7 @@ Base.empty!(r::Router) = empty!(r.pagestack)
 
 function getcurrentpage(r::Router{T})::T where T
   current = if isempty(r.pagestack)
+    push!(r.pagestack, r.home)
     r.home
   else
     last(r.pagestack)
