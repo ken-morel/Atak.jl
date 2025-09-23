@@ -1,1 +1,2 @@
-abstract type Application end
+export AbstractApplication
+abstract type AbstractApplication <: Efus.AbstractComponent end
