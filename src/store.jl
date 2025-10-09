@@ -80,7 +80,6 @@ end
 writes value to the document, uses convert(T) to 
 ensure `value` is of the right type.
 """
-@inline
 function IonicEfus.setvalue!(doc::Document{T}, value)::T where {T}
     return jldopen(doc.filename, "w") do data
         data["modified"] = now()
@@ -105,7 +104,6 @@ in that the callback returns a value.
 The function returns the new value returned 
 by the callback.
 """
-@inline
 function update!(doc::Document{T}, fn::Function)::T where {T}
     return set!(doc, get(doc) |> fn)
 end
