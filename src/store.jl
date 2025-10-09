@@ -142,6 +142,7 @@ const Collection{T} = Document{Vector{T}}
 
 """
     collection(namespace::Namespace, name::Symbol, ::Type{T}, default = T[])
+    collection(namespace::Namespace, name::Symbol, default::Vector{T})
 
 Create a new collection in namespace or store, the collection stores
 objects of type t and with an optional default value.
@@ -151,6 +152,9 @@ function collection(namespace::Namespace, name::Symbol, ::Type{T}, default = T[]
     setvalue!(col, default)
     return col
 end
+collection(
+    namespace::Namespace, name::Symbol, default::Vector{T},
+) where {T} = collection(namespace, name, T, default)
 
 """
     const Store = Namespace
