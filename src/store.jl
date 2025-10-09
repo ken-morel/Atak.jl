@@ -105,9 +105,10 @@ The function returns the new value returned
 by the callback.
 """
 function update!(doc::Document{T}, fn::Function)::T where {T}
-    return set!(doc, get(doc) |> fn)
+    return setvalue!(doc, get(doc) |> fn)
 end
-update!(fn::Function, doc::Document{T})::T where {T} = update!(doc, fn)
+
+update!(fn::Function, doc::Document{T}) where {T} = update!(doc, fn)
 
 """
     alter!(fn!::Function, doc::Document{T})::Any
