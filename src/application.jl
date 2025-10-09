@@ -1,3 +1,9 @@
-export AbstractApplication
+public Application
 
-abstract type AbstractApplication <: Efus.AbstractComponent end
+"""
+    abstract type Application <: IonicEfus.Component end
+
+Represents the base abstract type for all
+atak applications.
+"""
+abstract type Application <: IonicEfus.Component end
