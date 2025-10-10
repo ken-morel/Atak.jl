@@ -17,6 +17,7 @@ task.
     High = 2
     Normal = 3
     Low = 4
+    BackgroundTask = 5
 end
 
 struct PriorityTask
@@ -58,12 +59,14 @@ Schedule function `cb` with Priority `p` on the scheduler instance.
 See also [`Scheduler`](@ref), [`Priority`](@ref).
 """
 function schedule!(s::Scheduler, cb::Function, p::Priority = Normal)
-    return @lock s.lock begin
+    @lock s.lock begin
         s.heap.counter += 1
         task = PriorityTask(cb, p, s.heap.counter)
         push!(s.heap, task)
-        Threads.notify(s.work_signal)
     end
+
+    @lock s.work_signal Threads.notify(s.work_signal)
+    return
 end
 schedule!(cb::Function, s::Scheduler, p::Priority = Normal) = schedule!(s, cb, p)
 
@@ -98,20 +101,19 @@ function stop!(s::Scheduler)
             return
         end
         s.is_running = false
-        Threads.notify(s.work_signal; all = true)
     end
+
+    @lock s.work_signal Threads.notify(s.work_signal; all = true)
     foreach(wait, s.workers)
     return empty!(s.workers)
 end
 
 function worker_loop(s::Scheduler)
     while @lock s.lock s.is_running
-        task = @lock s.lock begin
-            while isempty(s.heap) && s.is_running
-                Threads.wait(s.work_signal)
-            end
-            s.is_running ? pop!(s.heap) : nothing
+        while @lock s.lock (isempty(s.heap) && s.is_running)
+            @lock s.work_signal Threads.wait(s.work_signal)
         end
+        task = @lock s.lock (s.is_running ? pop!(s.heap) : nothing)
 
         if !isnothing(task)
             try
