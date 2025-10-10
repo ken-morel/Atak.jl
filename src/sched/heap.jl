@@ -1,38 +1,32 @@
-public BinaryHeap
+mutable struct TaskHeap
+    nodes::Vector{AbstractPriorityTask}
 
-"""
-    mutable struct BinaryHeap{T}
-
-A minimal BinaryHeap implementation
-"""
-mutable struct BinaryHeap{T}
-    nodes::Vector{T}
-    counter::UInt64 # Used to assign unique IDs to tasks for FIFO tie-breaking
-
-    BinaryHeap{T}() where {T} = new{T}(Vector{T}(), 0)
+    TaskHeap() = new(Vector{AbstractPriorityTask}())
 end
 
-Base.isempty(h::BinaryHeap) = isempty(h.nodes)
-Base.length(h::BinaryHeap) = length(h.nodes)
+Base.isempty(h::TaskHeap) = isempty(h.nodes)
+Base.length(h::TaskHeap) = length(h.nodes)
+Base.contains(h::TaskHeap, v::AbstractPriorityTask) = v ∈ h.nodes
 
-function Base.push!(h::BinaryHeap{T}, val::T) where {T}
+function Base.push!(h::TaskHeap, val::AbstractPriorityTask)
+    filter!(n -> !issametask(val, n), h.nodes)
     push!(h.nodes, val)
-    return sift_up!(h, length(h.nodes))
+    return sift_up!(h, lastindex(h.nodes))
 end
 
-function Base.pop!(h::BinaryHeap)
+function Base.pop!(h::TaskHeap)
     isempty(h) && return nothing
     # Swap the root with the last element
     x = h.nodes[1]
     last = pop!(h.nodes)
     if !isempty(h)
         h.nodes[1] = last
-        sift_down!(h, 1)
+        sift_down!(h, firstindex(h.nodes))
     end
     return x
 end
 
-function sift_up!(h::BinaryHeap, i::Int)
+function sift_up!(h::TaskHeap, i::Int)
     i == 1 && return
     parent = i >> 1
     while i > 1 && isless(h.nodes[i], h.nodes[parent])
@@ -43,7 +37,7 @@ function sift_up!(h::BinaryHeap, i::Int)
     return
 end
 
-function sift_down!(h::BinaryHeap, i::Int)
+function sift_down!(h::TaskHeap, i::Int)
     n = length(h.nodes)
     while true
         left = i << 1
