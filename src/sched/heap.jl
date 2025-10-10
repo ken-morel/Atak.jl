@@ -9,7 +9,13 @@ Base.length(h::TaskHeap) = length(h.nodes)
 Base.contains(h::TaskHeap, v::AbstractPriorityTask) = v ∈ h.nodes
 
 function Base.push!(h::TaskHeap, val::AbstractPriorityTask)
-    filter!(n -> !issametask(val, n), h.nodes)
+    for (idx, task) in enumerate(h.nodes)
+        if issametask(task, val)
+            h.nodes[idx] = val
+            sift_up!(h, idx)
+            return
+        end
+    end
     push!(h.nodes, val)
     return sift_up!(h, lastindex(h.nodes))
 end

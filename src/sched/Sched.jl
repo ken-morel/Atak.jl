@@ -1,5 +1,5 @@
 module Sched
-using ..Atak: Reactant
+using IonicEfus
 
 abstract type AbstractPriorityTask end
 

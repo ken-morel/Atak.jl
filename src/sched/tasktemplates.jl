@@ -1,17 +1,24 @@
-struct ReactantUpdate
+# Defaults
+getpriority(t::AbstractPriorityTask) = t.priority
+gettime(t::AbstractPriorityTask) = t.created
+run(t::AbstractPriorityTask) = t.fn()
+issametask(::AbstractPriorityTask, ::AbstractPriorityTask) = false
+
+
+# ReactantUpdate
+struct ReactantUpdate <: AbstractPriorityTask
     created::UInt
     priority::Priority
-    reactant::Reactant
+    reactant::AbstractReactive
     fn::Function
-    ReactantUpdate(fn::Function, r::Reactant, p::Priority) = new(time_ns(), p, r, fn)
+    ReactantUpdate(fn::Function, r::AbstractReactive, p::Priority) = new(time_ns(), p, r, fn)
 end
-
-getpriority(t::ReactantUpdate) = t.priority
-gettime(t::ReactantUpdate) = t.created
 
 issametask(a::ReactantUpdate, b::ReactantUpdate) = a.reactant == b.reactant
 
-struct CallbackCall
+
+# CallbackCall
+struct CallbackCall <: AbstractPriorityTask
     created::UInt
     priority::Priority
     callback::Function
@@ -19,14 +26,16 @@ struct CallbackCall
     CallbackCall(fn::Function, cb::Function, p::Priority) = new(time_ns(), p, cb, fn)
 end
 
-getpriority(t::CallbackCall) = t.priority
-gettime(t::CallbackCall) = t.created
-
 issametask(a::CallbackCall, b::CallbackCall) = a.callback == b.callback
 
-"""
-    issametask(::AbstractPriorityTask, ::AbstractPriorityTask) = false
 
-Default issametask definition.
-"""
-issametask(::AbstractPriorityTask, ::AbstractPriorityTask) = false
+# Simple task
+struct SimpleTask <: AbstractPriorityTask
+    created::UInt
+    priority::Priority
+    fn::Function
+    SimpleTask(fn::Function, p::Priority) = new(time_ns(), p, fn)
+end
+
+
+issametask(a::SimpleTask, b::SimpleTask) = a.fn == b.fn

@@ -18,4 +18,4 @@ task.
 end
 
 Base.isless(a::AbstractPriorityTask, b::AbstractPriorityTask) =
-    (getpriority(a) < getpriority(b)) || (getpriority(a) < getpriority(b)  && gettime(a) < gettime(b))
+    (getpriority(a) < getpriority(b)) || (getpriority(a) == getpriority(b)  && gettime(a) < gettime(b))
