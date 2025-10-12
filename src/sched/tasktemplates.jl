@@ -28,6 +28,17 @@ end
 
 issametask(a::CallbackCall, b::CallbackCall) = a.callback == b.callback
 
+# Component update
+
+struct ComponentUpdate <: AbstractPriorityTask
+    created::UInt
+    priority::Priority
+    comp::Component
+    fn::Function
+    ComponentUpdate(fn::Function, c::Component, p::Priority) = new(time_ns(), p, c, fn)
+    ComponentUpdate(c::Component, p::Priority) = new(time_ns(), p, c, () -> IonicEfus.update!(c))
+end
+
 
 # Simple task
 struct SimpleTask <: AbstractPriorityTask

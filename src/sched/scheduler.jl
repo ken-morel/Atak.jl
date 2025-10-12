@@ -11,7 +11,7 @@ in a specified number of asynchronious worker tasks,
 defaulting to `Threads.nthreads()`.
 """
 Base.@kwdef mutable struct Scheduler
-    heap::BinaryHeap{AbstractPriorityTask} = BinaryHeap{AbstractPriorityTask}()
+    heap::TaskHeap = TaskHeap()
     const lock::ReentrantLock = ReentrantLock()
     const work_signal::Threads.Condition = Threads.Condition()
     workers::Vector{Task} = []
@@ -32,7 +32,6 @@ function schedule!(s::Scheduler, task::AbstractPriorityTask)
             push!(s.heap, task)
         end
     end
-
     @lock s.work_signal Threads.notify(s.work_signal)
     return
 end
@@ -69,20 +68,31 @@ function stop!(s::Scheduler)
         end
         s.is_running = false
     end
-
     @lock s.work_signal Threads.notify(s.work_signal; all = true)
+
     foreach(wait, s.workers)
-    return empty!(s.workers)
+    empty!(s.workers)
+    return
 end
 
 function worker_loop(s::Scheduler)
-    while @lock s.lock s.is_running
-        while @lock s.lock (isempty(s.heap) && s.is_running)
-            @lock s.work_signal Threads.wait(s.work_signal)
-        end
-        task = @lock s.lock (s.is_running ? pop!(s.heap) : nothing)
+    try
+        while true # Loop until we are told to stop
+            # The while loop and wait() must be inside the same lock block.
+            while @lock s.lock isempty(s.heap) && s.is_running
+                @lock s.work_signal Threads.wait(s.work_signal)
+            end
+            task = @lock s.lock begin
+                # If we woke up but are no longer running, exit the outer loop.
+                if !s.is_running
+                    return
+                end
 
-        if !isnothing(task)
+                # We are guaranteed to have a task here if we are running.
+                pop!(s.heap)
+            end
+
+            # The callback is correctly called outside the lock.
             try
                 run(task)
             catch e
@@ -91,6 +101,10 @@ function worker_loop(s::Scheduler)
                 println(stderr)
             end
         end
+    catch e
+        Base.printstyled(stderr, "Error in sheduler worker:\n"; color = :red, bold = true)
+        Base.showerror(stderr, e, catch_backtrace())
+        println(stderr)
     end
     return
 end
