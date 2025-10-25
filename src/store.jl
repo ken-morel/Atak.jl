@@ -68,7 +68,6 @@ Does not handle errors reading the file,
 so it is adviced to wrap them in try-catch blocks.
 """
 function IonicEfus.getvalue(doc::Document{T})::T where {T}
-    !ispath(doc.filename) && return nothing
     return jldopen(doc.filename, "r") do data
         data["data"]
     end
@@ -105,7 +104,7 @@ The function returns the new value returned
 by the callback.
 """
 function update!(doc::Document{T}, fn::Function)::T where {T}
-    return setvalue!(doc, get(doc) |> fn)
+    return setvalue!(doc, getvalue(doc) |> fn)
 end
 
 update!(fn::Function, doc::Document{T}) where {T} = update!(doc, fn)
@@ -124,9 +123,9 @@ See also [`update!`](@ref).
 function alter!(
         fn!::Function, doc::Document{T}
     ) where {T}
-    data = doc |> get
+    data = doc |> getvalue
     ret = fn!(data)
-    set!(doc, data)
+    setvalue!(doc, data)
     return ret
 end
 
@@ -148,7 +147,11 @@ objects of type t and with an optional default value.
 """
 function collection(namespace::Namespace, name::Symbol, ::Type{T}, default = T[]) where {T}
     col = Collection{T}(joinpath(namespace.foldername, string(name) * ".jld2"))
-    setvalue!(col, default)
+    try
+        getvalue(col)
+    catch
+        setvalue!(col, default)
+    end
     return col
 end
 collection(

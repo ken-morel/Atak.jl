@@ -47,6 +47,3 @@ struct SimpleTask <: AbstractPriorityTask
     fn::Function
     SimpleTask(fn::Function, p::Priority) = new(time_ns(), p, fn)
 end
-
-
-issametask(a::SimpleTask, b::SimpleTask) = a.fn == b.fn

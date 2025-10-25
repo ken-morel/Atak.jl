@@ -35,6 +35,8 @@ function schedule!(s::Scheduler, task::AbstractPriorityTask)
     @lock s.work_signal Threads.notify(s.work_signal)
     return
 end
+schedule!(fn::Function, s::Scheduler, p::Priority = Normal) = schedule!(s, SimpleTask(fn, p))
+
 
 """
     start!(s::Scheduler)
