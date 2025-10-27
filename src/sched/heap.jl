@@ -6,7 +6,7 @@ end
 
 Base.isempty(h::TaskHeap) = isempty(h.nodes)
 Base.length(h::TaskHeap) = length(h.nodes)
-Base.contains(h::TaskHeap, v::AbstractPriorityTask) = in(v, h.nodes)
+Base.contains(h::TaskHeap, v::AbstractPriorityTask) = v in h.nodes
 
 function Base.push!(h::TaskHeap, val::AbstractPriorityTask)
     for (idx, task) in enumerate(h.nodes)

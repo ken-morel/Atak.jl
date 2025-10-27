@@ -14,7 +14,7 @@ struct ReactantUpdate <: AbstractPriorityTask
     ReactantUpdate(fn::Function, r::AbstractReactive, p::Priority) = new(time_ns(), p, r, fn)
 end
 
-issametask(a::ReactantUpdate, b::ReactantUpdate) = a.reactant == b.reactant
+issametask(a::ReactantUpdate, b::ReactantUpdate) = a.reactant === b.reactant
 
 
 # CallbackCall
@@ -26,7 +26,7 @@ struct CallbackCall <: AbstractPriorityTask
     CallbackCall(fn::Function, cb::Function, p::Priority) = new(time_ns(), p, cb, fn)
 end
 
-issametask(a::CallbackCall, b::CallbackCall) = a.callback == b.callback
+issametask(a::CallbackCall, b::CallbackCall) = a.callback === b.callback
 
 # Component update
 
@@ -38,6 +38,7 @@ struct ComponentUpdate <: AbstractPriorityTask
     ComponentUpdate(fn::Function, c::Component, p::Priority) = new(time_ns(), p, c, fn)
     ComponentUpdate(c::Component, p::Priority) = new(time_ns(), p, c, () -> IonicEfus.update!(c))
 end
+issametask(a::ComponentUpdate, b::ComponentUpdate) = a.comp === b.comp
 
 
 # Simple task

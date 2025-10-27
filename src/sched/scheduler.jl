@@ -79,26 +79,21 @@ end
 
 function worker_loop(s::Scheduler)
     try
-        while true # Loop until we are told to stop
-            # The while loop and wait() must be inside the same lock block.
+        while true
             while @lock s.lock isempty(s.heap) && s.is_running
                 @lock s.work_signal Threads.wait(s.work_signal)
             end
             task = @lock s.lock begin
-                # If we woke up but are no longer running, exit the outer loop.
                 if !s.is_running
                     return
                 end
-
-                # We are guaranteed to have a task here if we are running.
                 pop!(s.heap)
             end
 
-            # The callback is correctly called outside the lock.
             try
                 run(task)
             catch e
-                Base.printstyled(stderr, "Error in scheduled task:\n"; color = :red, bold = true)
+                Base.printstyled(stderr, "Error in $(typeof(task)) task:\n"; color = :red, bold = true)
                 Base.showerror(stderr, e, catch_backtrace())
                 println(stderr)
             end
