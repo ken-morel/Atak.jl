@@ -2,12 +2,16 @@ module Atak
 
 using JLD2
 using Dates
-using IonicEfus
+using Efus
+using Ionic
 
-include("./binaryheap.jl")
-
+import Ionic: update!
 include("./application.jl")
 include("./store.jl")
-include("./scheduler.jl")
+include("./sched/Sched.jl")
+
+using .Sched
+
+export Sched, Scheduler, schedule!, schedule!, start!, stop!
 
 end

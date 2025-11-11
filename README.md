@@ -1,8 +1,10 @@
 # Atak.jl
 
+[![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl)
+
 Welcome to atak!
 Atak is a set of tools to help users of
-[IonicEfus.jl](https://github.com/ken-morel/IonicEfus.jl)
+[Efus.jl](https://github.com/ken-morel/Efus.jl)
 and other library creators by providing them
 some useful tools for creating applicaitons.
 

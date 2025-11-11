@@ -1,6 +1,5 @@
 export store, namespace, document, collection
 export Store, Namespace, Document, Collection
-export update!, alter!, set!
 
 abstract type AbstractStoreNode end
 abstract type AbstractStoreContainer <: AbstractStoreNode end
@@ -56,32 +55,29 @@ function document(namespace::Namespace, name::Symbol, ::Type{T}, value) where {T
     setvalue!(doc, value)
     return doc
 end
-document(
-    namespace::Namespace, name::Symbol, value::T,
-) where {T} = document(namespace, name, T, value)
+document(namespace::Namespace, name::Symbol, value::T) where {T} =
+    document(namespace, name, T, value)
 
 """
-    IonicEfus.getvalue(doc::Document{T})::T
+    Ionic.getvalue(doc::Document{T})::T
 
 Read the data stored in the document file.
 Does not handle errors reading the file,
 so it is adviced to wrap them in try-catch blocks.
 """
-function IonicEfus.getvalue(doc::Document{T})::T where {T}
-    !ispath(doc.filename) && return nothing
+function Ionic.getvalue(doc::Document{T})::T where {T}
     return jldopen(doc.filename, "r") do data
         data["data"]
     end
 end
 
 """
-    IonicEfus.setvalue!(doc::Document{T}, value)::T
+    Ionic.setvalue!(doc::Document{T}, value)::T
 
 writes value to the document, uses convert(T) to 
 ensure `value` is of the right type.
 """
-@inline
-function IonicEfus.setvalue!(doc::Document{T}, value)::T where {T}
+function Ionic.setvalue!(doc::Document{T}, value)::T where {T}
     return jldopen(doc.filename, "w") do data
         data["modified"] = now()
         data["data"] = convert(T, value)
@@ -105,14 +101,11 @@ in that the callback returns a value.
 The function returns the new value returned 
 by the callback.
 """
-@inline
-function update!(doc::Document{T}, fn::Function)::T where {T}
-    return set!(doc, get(doc) |> fn)
-end
-update!(fn::Function, doc::Document{T})::T where {T} = update!(doc, fn)
+Ionic.update!(doc::Document, fn::Function) = setvalue!(doc, getvalue(doc) |> fn)
+Ionic.update!(fn::Function, doc::Document) = update!(doc, fn)
 
 """
-    alter!(fn!::Function, doc::Document{T})::Any
+    Ionic.alter!(fn!::Function, doc::Document{T})::Any
 
 Modify the value stored in the document
 by modifying directly the object, an alter!
@@ -122,12 +115,10 @@ value by the function.
 
 See also [`update!`](@ref).
 """
-function alter!(
-        fn!::Function, doc::Document{T}
-    ) where {T}
-    data = doc |> get
+function Ionic.alter!(fn!::Function, doc::Document{T}) where {T}
+    data = doc |> getvalue
     ret = fn!(data)
-    set!(doc, data)
+    setvalue!(doc, data)
     return ret
 end
 
@@ -149,12 +140,15 @@ objects of type t and with an optional default value.
 """
 function collection(namespace::Namespace, name::Symbol, ::Type{T}, default = T[]) where {T}
     col = Collection{T}(joinpath(namespace.foldername, string(name) * ".jld2"))
-    setvalue!(col, default)
+    try
+        getvalue(col)
+    catch
+        setvalue!(col, default)
+    end
     return col
 end
-collection(
-    namespace::Namespace, name::Symbol, default::Vector{T},
-) where {T} = collection(namespace, name, T, default)
+collection(namespace::Namespace, name::Symbol, default::Vector{T}) where {T} =
+    collection(namespace, name, T, default)
 
 """
     const Store = Namespace
