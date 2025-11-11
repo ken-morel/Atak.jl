@@ -1,5 +1,5 @@
 module Sched
-using IonicEfus
+using Efus
 
 abstract type AbstractPriorityTask end
 

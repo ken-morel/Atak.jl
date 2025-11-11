@@ -91,7 +91,7 @@ function worker_loop(s::Scheduler)
             end
 
             try
-                run(task)
+                Base.invokelatest(run, task)
             catch e
                 Base.printstyled(stderr, "Error in $(typeof(task)) task:\n"; color = :red, bold = true)
                 Base.showerror(stderr, e, catch_backtrace())

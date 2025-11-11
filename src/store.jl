@@ -100,8 +100,8 @@ in that the callback returns a value.
 
 The function returns the new value returned 
 by the callback.
-"""Ionic.update!(doc::Document, fn::Function) where {T} =
-    setvalue!(doc, getvalue(doc) |> fn)
+"""
+Ionic.update!(doc::Document, fn::Function) = setvalue!(doc, getvalue(doc) |> fn)
 Ionic.update!(fn::Function, doc::Document) = update!(doc, fn)
 
 """

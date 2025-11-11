@@ -36,7 +36,7 @@ struct ComponentUpdate <: AbstractPriorityTask
     comp::Component
     fn::Function
     ComponentUpdate(fn::Function, c::Component, p::Priority) = new(time_ns(), p, c, fn)
-    ComponentUpdate(c::Component, p::Priority) = new(time_ns(), p, c, () -> IonicEfus.update!(c))
+    ComponentUpdate(c::Component, p::Priority) = new(time_ns(), p, c, () -> Efus.update!(c))
 end
 issametask(a::ComponentUpdate, b::ComponentUpdate) = a.comp === b.comp
 
