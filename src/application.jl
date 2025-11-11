@@ -6,4 +6,4 @@ public Application
 Represents the base abstract type for all
 atak applications.
 """
-abstract type Application <: IonicEfus.Component end
+abstract type Application <: Efus.Component end

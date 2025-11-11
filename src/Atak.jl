@@ -2,9 +2,10 @@ module Atak
 
 using JLD2
 using Dates
-using IonicEfus
+using Efus
+using Ionic
 
-import IonicEfus: update!
+import Ionic: update!
 include("./application.jl")
 include("./store.jl")
 include("./sched/Sched.jl")
